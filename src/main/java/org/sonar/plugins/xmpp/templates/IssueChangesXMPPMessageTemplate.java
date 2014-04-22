@@ -58,6 +58,24 @@ public class IssueChangesXMPPMessageTemplate extends AbstractXMPPTemplate {
     return message;
   }
 
+  public XMPPMessage formatForDuplication(Notification notification) {
+    StringBuilder messageBuilder = new StringBuilder();
+    appendHeader(notification, messageBuilder);
+    messageBuilder.append(NEW_LINE);
+    appendChanges(notification, messageBuilder);
+    messageBuilder.append(NEW_LINE);
+    appendFooter(messageBuilder, notification);
+
+    String issueKey = notification.getFieldValue("key");
+    String author = notification.getFieldValue("changeAuthor");
+
+    XMPPMessage message = new XMPPMessage()
+      .setMessageId("issue-changes/" + issueKey)
+      .setMessage(messageBuilder.toString())
+      .setFrom(getUserFullName(author));
+    return message;
+  }
+
   private void appendChanges(Notification notification, StringBuilder messageBuilder) {
     appendField(messageBuilder, "Comment", null, notification.getFieldValue("comment"));
     appendFieldWithoutHistory(messageBuilder, "Assignee", notification.getFieldValue("old.assignee"), notification.getFieldValue("new.assignee"));
